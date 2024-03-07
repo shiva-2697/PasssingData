@@ -21,7 +21,7 @@ struct ContentView: View {
                     .border(.secondary)
                     .padding()
                 NavigationLink(destination: PageTwoView(textTwo: $textOne)) {
-                    Label("View Image", systemImage: "rectange.potrait.and.arrow.forward")
+                    Label("Submit", systemImage: "rectangle.portrait.and.arrow.right")
                         .font(.headline)
                         .foregroundColor(.accentColor)
                 }

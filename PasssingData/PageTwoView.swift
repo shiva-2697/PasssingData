@@ -10,6 +10,10 @@ import SwiftUI
 struct PageTwoView: View {
     
     @Binding var textTwo: String
+    @State var response: ChatGptRespone?
+    
+    @StateObject private var viewModel = PageTwoViewModel()
+    @State var isHidden = false
     
     var body: some View {
         VStack {
@@ -17,23 +21,38 @@ struct PageTwoView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
                 .scaledToFit()
-            AsyncImage(url: URL(string: textTwo)) { image in
-                image.resizable()
-                    .scaledToFit()
-                    .frame(width: 600, height: 300)
-            } placeholder: {
-                ProgressView()
-            }
-            NavigationLink(destination: PageThreeView(textThree: $textTwo)) {
-                Label("View Image in Full size", systemImage: "rectange.potrait.and.arrow.forward")
-                    .font(.headline)
-                    .foregroundColor(.accentColor)
-            }
+            Text(response?.message ?? "")
+                .bold()
+                .font(.title)
+            ProgressView()
+                .isHidden(isHidden)
         }
         .padding()
+        .task {
+            do {
+                response = try await viewModel.laodDataFromChatGPT(inputFromPageOne: textTwo)
+                isHidden = true
+            } catch ChatGptRespose.responseError {
+                print("Server Down")
+            } catch ChatGptRespose.urlError {
+                print("URL Error")
+            } catch {
+                print("Something went wrong", error)
+            }
+        }
     }
 }
 
 #Preview {
-    PageTwoView(textTwo: .constant(""))
+    PageTwoView(textTwo: .constant("Hello"))
+}
+
+extension View {
+    @ViewBuilder func isHidden(_ isHidden: Bool) -> some View {
+        if isHidden {
+            self.hidden()
+        } else {
+            self
+        }
+    }
 }
